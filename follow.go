@@ -59,7 +59,7 @@ func getLinkPath(info os.FileInfo) string {
 
 	if link != 0 {
 		linkPath, _ := filepath.EvalSymlinks(info.Name())
-		return linkPath
+		return color.BlueString(linkPath)
 	}
 
 	return ""
@@ -104,9 +104,9 @@ func outputResults(files []os.FileInfo, ugly bool) {
 
 	for _, f := range files {
 		if ugly {
-			fmt.Fprintf(writer, "%s\n", getFileName(f, false))
+			fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, false), getLinkPath(f))
 		} else {
-			fmt.Fprintf(writer, "%s\n", getFileName(f, true))
+			fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, true), getLinkPath(f))
 		}
 	}
 
