@@ -43,7 +43,13 @@ func getLinkPath(info os.FileInfo) string {
 	link := mode & os.ModeSymlink
 
 	if link != 0 {
-		linkPath, _ := filepath.EvalSymlinks(info.Name())
+		linkPath, err := filepath.EvalSymlinks(info.Name())
+
+		if err != nil {
+			//fmt.Printf("ERROR: %s\n", info.Name())
+			return ""
+		}
+
 		return color.BlueString(linkPath)
 	}
 
@@ -88,10 +94,14 @@ func outputResults(files []os.FileInfo, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
 
 	for _, f := range files {
-		if ugly {
-			fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, false), getLinkPath(f))
-		} else {
-			fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, true), getLinkPath(f))
+		linkPath := getLinkPath(f)
+
+		if len(linkPath) > 0 {
+			if ugly {
+				fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, false), getLinkPath(f))
+			} else {
+				fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, true), getLinkPath(f))
+			}
 		}
 	}
 
