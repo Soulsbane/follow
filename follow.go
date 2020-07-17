@@ -14,12 +14,10 @@ import (
 )
 
 func getFileName(info os.FileInfo, colorize bool) string {
-	if colorize == true {
+	if colorize {
 		if isFileExecutable(info) {
 			return color.HiRedString(info.Name())
 		}
-
-		return color.WhiteString(info.Name())
 	}
 
 	return info.Name()
@@ -38,7 +36,7 @@ func isFileHidden(info os.FileInfo) bool {
 	return false
 }
 
-func getLinkPath(info os.FileInfo) string {
+func getLinkPath(info os.FileInfo, colorize bool) string {
 	mode := info.Mode()
 	link := mode & os.ModeSymlink
 
@@ -50,7 +48,11 @@ func getLinkPath(info os.FileInfo) string {
 			return ""
 		}
 
-		return color.BlueString(linkPath)
+		if colorize {
+			return color.BlueString(linkPath)
+		}
+
+		return linkPath
 	}
 
 	return ""
@@ -94,13 +96,22 @@ func outputResults(files []os.FileInfo, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
 
 	for _, f := range files {
-		linkPath := getLinkPath(f)
+		var linkPath string
+		var fileName string
+
+		if ugly {
+			linkPath = getLinkPath(f, false)
+			fileName = getFileName(f, false)
+		} else {
+			linkPath = getLinkPath(f, true)
+			fileName = getFileName(f, true)
+		}
 
 		if len(linkPath) > 0 {
 			if ugly {
-				fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, false), getLinkPath(f))
+				fmt.Fprintf(writer, "%s\t%s\n", fileName, linkPath)
 			} else {
-				fmt.Fprintf(writer, "%s\t%s\n", getFileName(f, true), getLinkPath(f))
+				fmt.Fprintf(writer, "%s\t%s\n", fileName, linkPath)
 			}
 		}
 	}
