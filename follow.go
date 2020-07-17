@@ -25,6 +25,7 @@ func getFileName(info os.FileInfo, colorize bool) string {
 	return info.Name()
 }
 
+// INFO: Always returns false if on windows.
 func isFileHidden(info os.FileInfo) bool {
 	if runtime.GOOS != "windows" {
 		if info.Name()[0:1] == "." {
@@ -33,23 +34,7 @@ func isFileHidden(info os.FileInfo) bool {
 
 		return false
 	}
-	// FIXME: Can't seem to find documentation for properly handling this on windows.
-	/*else {
-		//if runtime.GOOS == "windows" {
-		pointer, err := syscall.UTF16PtrFromString(info.Name())
 
-		if err != nil {
-			return false
-		}
-
-		attributes, err := syscall.GetFileAttributes(pointer)
-
-		if err != nil {
-			return false
-		}
-
-		return attributes&syscall.FILE_ATTRIBUTE_HIDDEN != 0
-	}*/
 	return false
 }
 
