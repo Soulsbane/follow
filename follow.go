@@ -92,6 +92,20 @@ func listFiles(ugly bool, showHidden bool) {
 	outputResults(filteredFiles, ugly)
 }
 
+func handleFileName(fileName string, ugly bool) {
+	info, err := os.Lstat(fileName)
+
+	if err != nil {
+		fmt.Println("File doesn't exist!")
+	} else {
+		if ugly {
+			fmt.Printf("%s\n", getLinkPath(info, false))
+		} else {
+			fmt.Printf("%s\n", getLinkPath(info, true))
+		}
+	}
+}
+
 func outputResults(files []os.FileInfo, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
 
@@ -122,10 +136,16 @@ func outputResults(files []os.FileInfo, ugly bool) {
 // If passed a file name it will show the linked path. If no arguments it will scan directory for links and display their paths.
 func main() {
 	var args struct {
-		Ugly   bool `arg:"-u" default:"false" help:"Remove colorized output. Yes it's ugly."`
-		Hidden bool `arg:"-i" default:"false" help:"Show hidden files."`
+		FileName string `arg:"positional"`
+		Ugly     bool   `arg:"-u" default:"false" help:"Remove colorized output. Yes it's ugly."`
+		Hidden   bool   `arg:"-i" default:"false" help:"Show hidden files."`
 	}
 
 	arg.MustParse(&args)
-	listFiles(args.Ugly, args.Hidden)
+
+	if args.FileName != "" {
+		handleFileName(args.FileName, args.Ugly)
+	} else {
+		listFiles(args.Ugly, args.Hidden)
+	}
 }
