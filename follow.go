@@ -10,6 +10,7 @@ import (
 	"text/tabwriter"
 
 	"github.com/alexflint/go-arg"
+	"github.com/brettski/go-termtables"
 	"github.com/fatih/color"
 )
 
@@ -108,6 +109,8 @@ func handleFileName(fileName string, ugly bool) {
 
 func outputResults(files []os.FileInfo, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
+	table := termtables.CreateTable()
+	table.AddHeaders("Name", "Destination")
 
 	for _, f := range files {
 		var linkPath string
@@ -125,12 +128,16 @@ func outputResults(files []os.FileInfo, ugly bool) {
 			if ugly {
 				fmt.Fprintf(writer, "%s\t%s\n", fileName, linkPath)
 			} else {
-				fmt.Fprintf(writer, "%s\t%s\n", fileName, linkPath)
+				table.AddRow(fileName, linkPath)
 			}
 		}
 	}
 
-	writer.Flush()
+	if ugly {
+		writer.Flush()
+	} else {
+		fmt.Println(table.Render())
+	}
 }
 
 // If passed a file name it will show the linked path. If no arguments it will scan directory for links and display their paths.
