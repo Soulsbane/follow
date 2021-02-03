@@ -49,10 +49,6 @@ func getLinkPath(info os.FileInfo, colorize bool) string {
 			return ""
 		}
 
-		if colorize {
-			return color.BlueString(linkPath)
-		}
-
 		return linkPath
 	}
 
@@ -116,17 +112,12 @@ func outputResults(files []os.FileInfo, ugly bool) {
 		var linkPath string
 		var fileName string
 
-		if ugly {
-			linkPath = getLinkPath(f, false)
-			fileName = getFileName(f, false)
-		} else {
-			linkPath = getLinkPath(f, true)
-			fileName = getFileName(f, true)
-		}
+		linkPath = getLinkPath(f, true)
+		fileName = f.Name()
 
 		if len(linkPath) > 0 {
 			if ugly {
-				fmt.Fprintf(writer, "%s\t%s\n", fileName, linkPath)
+				fmt.Fprintf(writer, "%s\t => %s\n", fileName, linkPath)
 			} else {
 				table.AddRow(fileName, linkPath)
 			}
