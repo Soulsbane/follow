@@ -37,6 +37,7 @@ func isFileHidden(info os.FileInfo) bool {
 	return false
 }
 
+// TODO: Check destination exists and mark in red if it doesn't
 func getLinkPath(info os.FileInfo, colorize bool) string {
 	mode := info.Mode()
 	link := mode & os.ModeSymlink
