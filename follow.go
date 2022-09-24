@@ -11,27 +11,12 @@ import (
 
 	"github.com/alexflint/go-arg"
 	"github.com/brettski/go-termtables"
-	"github.com/fatih/color"
 )
-
-func getFileName(info os.FileInfo, colorize bool) string {
-	if colorize {
-		if isFileExecutable(info) {
-			return color.HiRedString(info.Name())
-		}
-	}
-
-	return info.Name()
-}
 
 // INFO: Always returns false if on windows.
 func isFileHidden(info os.FileInfo) bool {
 	if runtime.GOOS != "windows" {
-		if info.Name()[0:1] == "." {
-			return true
-		}
-
-		return false
+		return info.Name()[0:1] == "."
 	}
 
 	return false
@@ -56,19 +41,8 @@ func getLinkPath(info os.FileInfo, colorize bool) string {
 	return ""
 }
 
-func isFileExecutable(info os.FileInfo) bool {
-	mode := info.Mode()
-	exec := mode & 0111
-
-	if exec != 0 {
-		return true
-	}
-
-	return false
-}
-
 func listFiles(ugly bool, showHidden bool) {
-	var filteredFiles []os.FileInfo
+	var files []os.FileInfo
 	files, err := ioutil.ReadDir(".")
 
 	if err != nil {
@@ -79,15 +53,21 @@ func listFiles(ugly bool, showHidden bool) {
 		if !f.IsDir() {
 			if isFileHidden(f) {
 				if showHidden {
-					filteredFiles = append(filteredFiles, f)
+					files = append(files, f)
 				}
 			} else {
-				filteredFiles = append(filteredFiles, f)
+				files = append(files, f)
 			}
 		}
 	}
 
-	outputResults(filteredFiles, ugly)
+	filteredFiles := filterValidLinks(files)
+
+	if len(filteredFiles) > 0 {
+		outputResults(filteredFiles, ugly)
+	} else {
+		fmt.Println("No links found!")
+	}
 }
 
 func handleFileName(fileName string, ugly bool) {
@@ -104,24 +84,30 @@ func handleFileName(fileName string, ugly bool) {
 	}
 }
 
-func outputResults(files []os.FileInfo, ugly bool) {
+func filterValidLinks(files []os.FileInfo) map[string]string {
+	filteredFiles := make(map[string]string)
+
+	for _, f := range files {
+		linkPath := getLinkPath(f, true)
+
+		if len(linkPath) > 0 {
+			filteredFiles[f.Name()] = linkPath
+		}
+	}
+
+	return filteredFiles
+}
+
+func outputResults(files map[string]string, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
 	table := termtables.CreateTable()
 	table.AddHeaders("Name", "Destination")
 
-	for _, f := range files {
-		var linkPath string
-		var fileName string
-
-		linkPath = getLinkPath(f, true)
-		fileName = f.Name()
-
-		if len(linkPath) > 0 {
-			if ugly {
-				fmt.Fprintf(writer, "%s\t => %s\n", fileName, linkPath)
-			} else {
-				table.AddRow(fileName, linkPath)
-			}
+	for fileName, linkPath := range files {
+		if ugly {
+			fmt.Fprintf(writer, "%s\t => %s\n", fileName, linkPath)
+		} else {
+			table.AddRow(fileName, linkPath)
 		}
 	}
 
