@@ -43,13 +43,13 @@ func getLinkPath(info os.FileInfo, colorize bool) string {
 
 func listFiles(ugly bool, showHidden bool) {
 	var files []os.FileInfo
-	files, err := ioutil.ReadDir(".")
+	dirList, err := ioutil.ReadDir(".")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for _, f := range files {
+	for _, f := range dirList {
 		if !f.IsDir() {
 			if isFileHidden(f) {
 				if showHidden {
