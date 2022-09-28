@@ -120,11 +120,7 @@ func outputResults(files map[string]string, ugly bool) {
 
 // If passed a file name it will show the linked path. If no arguments it will scan directory for links and display their paths.
 func main() {
-	var args struct {
-		FileName string `arg:"positional"`
-		Ugly     bool   `arg:"-u" default:"false" help:"Remove colorized output. Yes it's ugly."`
-		Hidden   bool   `arg:"-i" default:"false" help:"Show hidden files."`
-	}
+	var args ProgramArgs
 
 	arg.MustParse(&args)
 
