@@ -13,7 +13,6 @@ import (
 	"github.com/brettski/go-termtables"
 )
 
-// INFO: Always returns false if on windows.
 func isFileHidden(info os.FileInfo) bool {
 	if runtime.GOOS != "windows" {
 		return info.Name()[0:1] == "."
@@ -31,7 +30,6 @@ func getLinkPath(info os.FileInfo, colorize bool) string {
 		linkPath, err := filepath.EvalSymlinks(info.Name())
 
 		if err != nil {
-			//fmt.Printf("ERROR: %s\n", info.Name())
 			return ""
 		}
 
