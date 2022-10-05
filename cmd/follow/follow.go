@@ -5,50 +5,12 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
 	"text/tabwriter"
 
+	"github.com/Soulsbane/follow/internal/fileutils"
 	"github.com/alexflint/go-arg"
 	"github.com/brettski/go-termtables"
 )
-
-func isFileHidden(info os.FileInfo) bool {
-	if runtime.GOOS != "windows" {
-		return info.Name()[0:1] == "."
-	}
-
-	return false
-}
-
-func fileOrPathExists(fileName string) bool {
-	if _, err := os.Stat(fileName); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-
-		return false
-	}
-
-	return true
-}
-
-func getLinkPath(info os.FileInfo, colorize bool) string {
-	mode := info.Mode()
-	link := mode & os.ModeSymlink
-
-	if link != 0 {
-		linkPath, err := filepath.EvalSymlinks(info.Name())
-
-		if err != nil {
-			return ""
-		}
-
-		return linkPath
-	}
-
-	return ""
-}
 
 func listFiles(ugly bool, showHidden bool) {
 	var files []os.FileInfo
@@ -60,7 +22,7 @@ func listFiles(ugly bool, showHidden bool) {
 
 	for _, f := range dirList {
 		if !f.IsDir() {
-			if isFileHidden(f) {
+			if fileutils.IsFileHidden(f) {
 				if showHidden {
 					files = append(files, f)
 				}
@@ -86,9 +48,9 @@ func handleFileName(fileName string, ugly bool) {
 		fmt.Println("File doesn't exist!")
 	} else {
 		if ugly {
-			fmt.Printf("%s\n", getLinkPath(info, false))
+			fmt.Printf("%s\n", fileutils.GetLinkPath(info, false))
 		} else {
-			fmt.Printf("%s\n", getLinkPath(info, true))
+			fmt.Printf("%s\n", fileutils.GetLinkPath(info, true))
 		}
 	}
 }
@@ -97,7 +59,7 @@ func filterValidLinks(files []os.FileInfo) map[string]string {
 	filteredFiles := make(map[string]string)
 
 	for _, f := range files {
-		linkPath := getLinkPath(f, true)
+		linkPath := fileutils.GetLinkPath(f, true)
 
 		if len(linkPath) > 0 {
 			filteredFiles[f.Name()] = linkPath
