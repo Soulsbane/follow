@@ -1,6 +1,7 @@
 package fileutils
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -15,15 +16,11 @@ func IsFileHidden(info os.FileInfo) bool {
 }
 
 func FileOrPathExists(fileName string) bool {
-	if _, err := os.Stat(fileName); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-
+	if _, err := os.Stat(fileName); errors.Is(err, os.ErrNotExist) {
 		return false
+	} else {
+		return true
 	}
-
-	return true
 }
 
 func GetLinkPath(info os.FileInfo, colorize bool) string {
