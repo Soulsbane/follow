@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"text/tabwriter"
 
@@ -12,30 +10,11 @@ import (
 	"github.com/brettski/go-termtables"
 )
 
-func listFiles(ugly bool, showHidden bool) {
-	var files []os.FileInfo
-	dirList, err := ioutil.ReadDir(".")
+func listLinks(ugly bool, showHidden bool) {
+	filteredLinks := filterValidLinks(fileutils.GetListOfFiles(showHidden))
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, f := range dirList {
-		if !f.IsDir() {
-			if fileutils.IsFileHidden(f) {
-				if showHidden {
-					files = append(files, f)
-				}
-			} else {
-				files = append(files, f)
-			}
-		}
-	}
-
-	filteredFiles := filterValidLinks(files)
-
-	if len(filteredFiles) > 0 {
-		outputResults(filteredFiles, ugly)
+	if len(filteredLinks) > 0 {
+		outputResults(filteredLinks, ugly)
 	} else {
 		fmt.Println("No links found!")
 	}
@@ -98,6 +77,6 @@ func main() {
 	if args.FileName != "" {
 		handleFileName(args.FileName, args.Ugly)
 	} else {
-		listFiles(args.Ugly, args.Hidden)
+		listLinks(args.Ugly, args.Hidden)
 	}
 }
