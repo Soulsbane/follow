@@ -23,7 +23,7 @@ func FileOrPathExists(fileName string) bool {
 	}
 }
 
-func GetLinkPath(info os.FileInfo, colorize bool) string {
+func GetLinkPath(info os.FileInfo) string {
 	mode := info.Mode()
 	link := mode & os.ModeSymlink
 

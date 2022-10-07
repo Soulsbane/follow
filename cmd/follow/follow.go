@@ -27,9 +27,9 @@ func handleFileName(fileName string, ugly bool) {
 		fmt.Println("File doesn't exist!")
 	} else {
 		if ugly {
-			fmt.Printf("%s\n", fileutils.GetLinkPath(info, false))
+			fmt.Printf("%s\n", fileutils.GetLinkPath(info))
 		} else {
-			fmt.Printf("%s\n", fileutils.GetLinkPath(info, true))
+			fmt.Printf("%s\n", fileutils.GetLinkPath(info))
 		}
 	}
 }
@@ -38,7 +38,7 @@ func filterValidLinks(files []os.FileInfo) map[string]string {
 	filteredFiles := make(map[string]string)
 
 	for _, f := range files {
-		linkPath := fileutils.GetLinkPath(f, true)
+		linkPath := fileutils.GetLinkPath(f)
 
 		if len(linkPath) > 0 {
 			filteredFiles[f.Name()] = linkPath
