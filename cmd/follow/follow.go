@@ -7,7 +7,7 @@ import (
 
 	"github.com/Soulsbane/follow/internal/fileutils"
 	"github.com/alexflint/go-arg"
-	"github.com/brettski/go-termtables"
+	"github.com/jedib0t/go-pretty/v6/table"
 )
 
 func listLinks(ugly bool, showHidden bool) {
@@ -50,21 +50,24 @@ func filterValidLinks(files []os.FileInfo) map[string]string {
 
 func outputResults(files map[string]string, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
-	table := termtables.CreateTable()
-	table.AddHeaders("Name", "Destination")
+	outputTable := table.NewWriter()
+
+	outputTable.SetOutputMirror(os.Stdout)
+	outputTable.AppendHeader(table.Row{"Name", "Destination"})
 
 	for fileName, linkPath := range files {
 		if ugly {
 			fmt.Fprintf(writer, "%s\t => %s\n", fileName, linkPath)
 		} else {
-			table.AddRow(fileName, linkPath)
+			outputTable.AppendRow(table.Row{fileName, linkPath})
 		}
 	}
 
 	if ugly {
 		writer.Flush()
 	} else {
-		fmt.Println(table.Render())
+		outputTable.SetStyle(table.StyleLight)
+		outputTable.Render()
 	}
 }
 
