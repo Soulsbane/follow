@@ -66,7 +66,7 @@ func outputResults(files map[string]string, ugly bool) {
 	if ugly {
 		writer.Flush()
 	} else {
-		outputTable.SetStyle(table.StyleLight)
+		outputTable.SetStyle(table.StyleRounded)
 		outputTable.Render()
 	}
 }
