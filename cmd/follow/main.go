@@ -29,13 +29,25 @@ func handleFileName(fileName string, ugly bool) {
 		linkPath := fileutils.GetLinkPath(info)
 
 		if ugly {
-			fmt.Printf("%s\n", linkPath)
-		} else {
 			if fileutils.FileOrPathExists(linkPath) {
 				fmt.Printf("%s\n", linkPath)
 			} else {
-				fmt.Printf("%s(NOT FOUND)\n", linkPath)
+				fmt.Printf("%s is a broken link. Link points to a location that doesn't exist!\n", fileName)
 			}
+		} else {
+			outputTable := table.NewWriter()
+
+			outputTable.SetOutputMirror(os.Stdout)
+			outputTable.AppendHeader(table.Row{"Name", "Destination", "Broken"})
+
+			if fileutils.FileOrPathExists(linkPath) {
+				outputTable.AppendRow(table.Row{fileName, linkPath, "No"})
+			} else {
+				outputTable.AppendRow(table.Row{fileName, linkPath, "Yes"})
+			}
+
+			outputTable.SetStyle(table.StyleRounded)
+			outputTable.Render()
 		}
 	}
 }
