@@ -26,10 +26,16 @@ func handleFileName(fileName string, ugly bool) {
 	if err != nil {
 		fmt.Println("File doesn't exist!")
 	} else {
+		linkPath := fileutils.GetLinkPath(info)
+
 		if ugly {
-			fmt.Printf("%s\n", fileutils.GetLinkPath(info))
+			fmt.Printf("%s\n", linkPath)
 		} else {
-			fmt.Printf("%s\n", fileutils.GetLinkPath(info))
+			if fileutils.FileOrPathExists(linkPath) {
+				fmt.Printf("%s\n", linkPath)
+			} else {
+				fmt.Printf("%s(NOT FOUND)\n", linkPath)
+			}
 		}
 	}
 }
