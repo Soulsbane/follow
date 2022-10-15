@@ -15,7 +15,7 @@ func GetListOfFiles(includeHidden bool) []os.FileInfo {
 	}
 
 	for _, f := range dirList {
-		if !f.IsDir() {
+		if IsLink(f) {
 			if IsFileHidden(f) {
 				if includeHidden {
 					files = append(files, f)
