@@ -23,19 +23,16 @@ func FileOrPathExists(fileName string) bool {
 	}
 }
 
+func IsLink(info os.FileInfo) bool {
+	return info.Mode()&os.ModeSymlink != 0
+}
+
 func GetLinkPath(info os.FileInfo) string {
-	mode := info.Mode()
-	link := mode & os.ModeSymlink
+	linkPath, err := filepath.EvalSymlinks(info.Name())
 
-	if link != 0 {
-		linkPath, err := filepath.EvalSymlinks(info.Name())
-
-		if err != nil {
-			return ""
-		}
-
-		return linkPath
+	if err != nil {
+		return ""
 	}
 
-	return ""
+	return linkPath
 }

@@ -56,10 +56,12 @@ func filterValidLinks(files []os.FileInfo) map[string]string {
 	filteredFiles := make(map[string]string)
 
 	for _, f := range files {
-		linkPath := fileutils.GetLinkPath(f)
+		if fileutils.IsLink(f) {
+			linkPath := fileutils.GetLinkPath(f)
 
-		if len(linkPath) > 0 {
-			filteredFiles[f.Name()] = linkPath
+			if len(linkPath) > 0 {
+				filteredFiles[f.Name()] = linkPath
+			}
 		}
 	}
 
