@@ -10,16 +10,6 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
-func listLinks(ugly bool, showHidden bool) {
-	filteredLinks := filterValidLinks(fileutils.GetListOfLinks(showHidden))
-
-	if len(filteredLinks) > 0 {
-		outputResults(filteredLinks, ugly)
-	} else {
-		fmt.Println("No links found!")
-	}
-}
-
 func handleFileName(fileName string, ugly bool) {
 	info, err := os.Lstat(fileName)
 
@@ -52,20 +42,25 @@ func handleFileName(fileName string, ugly bool) {
 	}
 }
 
-func filterValidLinks(files []os.FileInfo) map[string]string {
-	filteredFiles := make(map[string]string)
+func listLinks(ugly bool, showHidden bool) {
+	linkResults := make(map[string]string)
+	links := fileutils.GetListOfLinks(showHidden)
 
-	for _, f := range files {
-		linkPath := fileutils.GetLinkPath(f)
+	for _, link := range links {
+		linkPath := fileutils.GetLinkPath(link)
 
 		if len(linkPath) > 0 {
-			filteredFiles[f.Name()] = linkPath
+			linkResults[link.Name()] = linkPath
 		} else {
-			filteredFiles[f.Name()] = "<BROKEN LINK>"
+			linkResults[link.Name()] = "<BROKEN LINK>"
 		}
 	}
 
-	return filteredFiles
+	if len(linkResults) > 0 {
+		outputResults(linkResults, ugly)
+	} else {
+		fmt.Println("No links found!")
+	}
 }
 
 func outputResults(files map[string]string, ugly bool) {
