@@ -11,7 +11,7 @@ import (
 )
 
 func listLinks(ugly bool, showHidden bool) {
-	filteredLinks := filterValidLinks(fileutils.GetListOfFiles(showHidden))
+	filteredLinks := filterValidLinks(fileutils.GetListOfLinks(showHidden))
 
 	if len(filteredLinks) > 0 {
 		outputResults(filteredLinks, ugly)
@@ -56,12 +56,12 @@ func filterValidLinks(files []os.FileInfo) map[string]string {
 	filteredFiles := make(map[string]string)
 
 	for _, f := range files {
-		if fileutils.IsLink(f) {
-			linkPath := fileutils.GetLinkPath(f)
+		linkPath := fileutils.GetLinkPath(f)
 
-			if len(linkPath) > 0 {
-				filteredFiles[f.Name()] = linkPath
-			}
+		if len(linkPath) > 0 {
+			filteredFiles[f.Name()] = linkPath
+		} else {
+			filteredFiles[f.Name()] = "<BROKEN LINK>"
 		}
 	}
 

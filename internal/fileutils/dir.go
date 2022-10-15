@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func GetListOfFiles(includeHidden bool) []os.FileInfo {
+func GetListOfLinks(includeHidden bool) []os.FileInfo {
 	var files []os.FileInfo
 	dirList, err := ioutil.ReadDir(".")
 
