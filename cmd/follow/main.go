@@ -18,6 +18,10 @@ func handleFileName(fileName string, ugly bool) {
 	} else {
 		linkPath := fileutils.GetLinkPath(info)
 
+		if len(linkPath) <= 0 {
+			linkPath = "<BROKEN LINK>"
+		}
+
 		if ugly {
 			if fileutils.FileOrPathExists(linkPath) {
 				fmt.Printf("%s => %s\n", fileName, linkPath)
@@ -28,12 +32,12 @@ func handleFileName(fileName string, ugly bool) {
 			outputTable := table.NewWriter()
 
 			outputTable.SetOutputMirror(os.Stdout)
-			outputTable.AppendHeader(table.Row{"Name", "Destination", "Broken"})
+			outputTable.AppendHeader(table.Row{"Name", "Destination"})
 
 			if fileutils.FileOrPathExists(linkPath) {
-				outputTable.AppendRow(table.Row{fileName, linkPath, "No"})
+				outputTable.AppendRow(table.Row{fileName, linkPath})
 			} else {
-				outputTable.AppendRow(table.Row{fileName, linkPath, "Yes"})
+				outputTable.AppendRow(table.Row{fileName, linkPath})
 			}
 
 			outputTable.SetStyle(table.StyleRounded)
