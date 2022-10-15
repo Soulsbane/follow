@@ -30,7 +30,7 @@ func handleFileName(fileName string, ugly bool) {
 
 		if ugly {
 			if fileutils.FileOrPathExists(linkPath) {
-				fmt.Printf("%s\n", linkPath)
+				fmt.Printf("%s => %s\n", fileName, linkPath)
 			} else {
 				fmt.Printf("%s is a broken link. Link points to a location that doesn't exist!\n", fileName)
 			}
