@@ -10,62 +10,65 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 )
 
+type Link struct {
+	name   string
+	path   string
+	exists bool
+}
+
 func handleFileName(fileName string, ugly bool) {
 	info, err := os.Lstat(fileName)
 
 	if err != nil {
 		fmt.Println("File doesn't exist!")
 	} else {
-		linkPath, pathExists := fileutils.GetLinkPath(info)
+		if fileutils.IsLink(info) {
+			linkPath, pathExists := fileutils.GetLinkPath(info)
+			results := []Link{}
+			currentLink := Link{name: fileName, path: linkPath, exists: pathExists}
 
-		if ugly {
-			if pathExists {
-				fmt.Printf("%s => %s\n", fileName, linkPath)
-			} else {
-				fmt.Printf("%s => %s (broken)\n", fileName, linkPath)
-			}
+			outputResults(append(results, currentLink), ugly)
 		} else {
-			outputTable := table.NewWriter()
-
-			outputTable.SetOutputMirror(os.Stdout)
-			outputTable.AppendHeader(table.Row{"Name", "Destination", "Exists"})
-			outputTable.AppendRow(table.Row{fileName, linkPath, pathExists})
-
-			outputTable.SetStyle(table.StyleRounded)
-			outputTable.Render()
+			fmt.Printf("%s is not a link!\n", fileName)
 		}
 	}
 }
 
 func listLinks(ugly bool, showHidden bool) {
-	linkResults := make(map[string]string)
 	links := fileutils.GetListOfLinks(showHidden)
+	results := []Link{}
 
 	for _, link := range links {
-		// TODO: Handle broken links
-		linkPath, _ := fileutils.GetLinkPath(link)
-		linkResults[link.Name()] = linkPath
+		linkPath, exists := fileutils.GetLinkPath(link)
+		currentLink := Link{name: link.Name(), path: linkPath, exists: exists}
+
+		results = append(results, currentLink)
 	}
 
-	if len(linkResults) > 0 {
-		outputResults(linkResults, ugly)
+	if len(results) > 0 {
+		outputResults(results, ugly)
 	} else {
 		fmt.Println("No links found!")
 	}
 }
 
-func outputResults(files map[string]string, ugly bool) {
+// TODO: Add color to broken links
+func outputResults(results []Link, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
 	outputTable := table.NewWriter()
 
 	outputTable.SetOutputMirror(os.Stdout)
-	outputTable.AppendHeader(table.Row{"Name", "Destination"})
+	outputTable.AppendHeader(table.Row{"Name", "Destination", "Exists"})
 
-	for fileName, linkPath := range files {
+	for _, link := range results {
 		if ugly {
-			fmt.Fprintf(writer, "%s\t => %s\n", fileName, linkPath)
+			if link.exists {
+				fmt.Fprintf(writer, "%s\t => %s\n", link.name, link.path)
+			} else {
+				fmt.Fprintf(writer, "%s\t => %s (BROKEN)\n", link.name, link.path)
+			}
 		} else {
-			outputTable.AppendRow(table.Row{fileName, linkPath})
+			outputTable.AppendRow(table.Row{link.name, link.path, link.exists})
 		}
 	}
 
