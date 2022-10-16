@@ -16,29 +16,20 @@ func handleFileName(fileName string, ugly bool) {
 	if err != nil {
 		fmt.Println("File doesn't exist!")
 	} else {
-		linkPath := fileutils.GetLinkPath(info)
-
-		if len(linkPath) <= 0 {
-			linkPath = "<BROKEN LINK>"
-		}
+		linkPath, pathExists := fileutils.GetLinkPath(info)
 
 		if ugly {
-			if fileutils.FileOrPathExists(linkPath) {
+			if pathExists {
 				fmt.Printf("%s => %s\n", fileName, linkPath)
 			} else {
-				fmt.Printf("%s is a broken link. Link points to a location that doesn't exist!\n", fileName)
+				fmt.Printf("%s => %s (broken)\n", fileName, linkPath)
 			}
 		} else {
 			outputTable := table.NewWriter()
 
 			outputTable.SetOutputMirror(os.Stdout)
-			outputTable.AppendHeader(table.Row{"Name", "Destination"})
-
-			if fileutils.FileOrPathExists(linkPath) {
-				outputTable.AppendRow(table.Row{fileName, linkPath})
-			} else {
-				outputTable.AppendRow(table.Row{fileName, linkPath})
-			}
+			outputTable.AppendHeader(table.Row{"Name", "Destination", "Exists"})
+			outputTable.AppendRow(table.Row{fileName, linkPath, pathExists})
 
 			outputTable.SetStyle(table.StyleRounded)
 			outputTable.Render()
@@ -51,13 +42,9 @@ func listLinks(ugly bool, showHidden bool) {
 	links := fileutils.GetListOfLinks(showHidden)
 
 	for _, link := range links {
-		linkPath := fileutils.GetLinkPath(link)
-
-		if len(linkPath) > 0 {
-			linkResults[link.Name()] = linkPath
-		} else {
-			linkResults[link.Name()] = "<BROKEN LINK>"
-		}
+		// TODO: Handle broken links
+		linkPath, _ := fileutils.GetLinkPath(link)
+		linkResults[link.Name()] = linkPath
 	}
 
 	if len(linkResults) > 0 {

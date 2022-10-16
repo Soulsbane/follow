@@ -3,7 +3,6 @@ package fileutils
 import (
 	"errors"
 	"os"
-	"path/filepath"
 	"runtime"
 )
 
@@ -27,12 +26,13 @@ func IsLink(info os.FileInfo) bool {
 	return info.Mode()&os.ModeSymlink != 0
 }
 
-func GetLinkPath(info os.FileInfo) string {
-	linkPath, err := filepath.EvalSymlinks(info.Name())
+// GetLinkPath returns the path of the link and a boolean indicating if the link destination path exists
+func GetLinkPath(info os.FileInfo) (string, bool) {
+	realPath, err := os.Readlink(info.Name())
 
 	if err != nil {
-		return ""
+		return "", FileOrPathExists(realPath)
 	}
 
-	return linkPath
+	return realPath, FileOrPathExists(realPath)
 }
