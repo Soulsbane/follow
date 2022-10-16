@@ -86,8 +86,10 @@ func main() {
 
 	arg.MustParse(&args)
 
-	if args.FileName != "" {
-		handleFileName(args.FileName, args.Ugly)
+	if len(args.FileName) > 0 {
+		if args.FileName[0] != "" {
+			handleFileName(args.FileName[0], args.Ugly)
+		}
 	} else {
 		listLinks(args.Ugly, args.Hidden)
 	}
