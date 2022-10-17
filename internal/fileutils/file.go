@@ -17,9 +17,9 @@ func IsFileHidden(info os.FileInfo) bool {
 func FileOrPathExists(fileName string) bool {
 	if _, err := os.Stat(fileName); errors.Is(err, os.ErrNotExist) {
 		return false
-	} else {
-		return true
 	}
+
+	return true
 }
 
 func IsLink(info os.FileInfo) bool {
