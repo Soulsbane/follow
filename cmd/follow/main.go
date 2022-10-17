@@ -8,6 +8,7 @@ import (
 	"github.com/Soulsbane/follow/internal/fileutils"
 	"github.com/alexflint/go-arg"
 	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jwalton/gchalk"
 )
 
 type Link struct {
@@ -15,6 +16,8 @@ type Link struct {
 	path   string
 	exists bool
 }
+
+var ErrorColor = gchalk.WithBold().Red
 
 func handleFileName(fileNames []string, ugly bool) {
 	results := []Link{}
@@ -56,6 +59,14 @@ func listLinks(ugly bool, showHidden bool) {
 	}
 }
 
+func toYesNo(value bool) string {
+	if value {
+		return "Yes"
+	}
+
+	return ErrorColor("No")
+}
+
 // TODO: Add color to broken links
 func outputResults(results []Link, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
@@ -69,10 +80,10 @@ func outputResults(results []Link, ugly bool) {
 			if link.exists {
 				fmt.Fprintf(writer, "%s\t => %s\n", link.name, link.path)
 			} else {
-				fmt.Fprintf(writer, "%s\t => %s (BROKEN)\n", link.name, link.path)
+				fmt.Fprintf(writer, "%s\t => %s %s\n", link.name, link.path, ErrorColor("(BROKEN)"))
 			}
 		} else {
-			outputTable.AppendRow(table.Row{link.name, link.path, link.exists})
+			outputTable.AppendRow(table.Row{link.name, link.path, toYesNo(link.exists)})
 		}
 	}
 
