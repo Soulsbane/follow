@@ -16,22 +16,26 @@ type Link struct {
 	exists bool
 }
 
-func handleFileName(fileName string, ugly bool) {
-	info, err := os.Lstat(fileName)
+func handleFileName(fileNames []string, ugly bool) {
+	results := []Link{}
 
-	if err != nil {
-		fmt.Println("File doesn't exist!")
-	} else {
-		if fileutils.IsLink(info) {
-			linkPath, pathExists := fileutils.GetLinkPath(info)
-			results := []Link{}
-			currentLink := Link{name: fileName, path: linkPath, exists: pathExists}
+	for _, fileName := range fileNames {
+		info, err := os.Lstat(fileName)
 
-			outputResults(append(results, currentLink), ugly)
+		if err != nil {
+			fmt.Printf("%s could not be found!\n", fileName)
 		} else {
-			fmt.Printf("%s is not a link!\n", fileName)
+			if fileutils.IsLink(info) {
+				linkPath, pathExists := fileutils.GetLinkPath(info)
+				currentLink := Link{name: fileName, path: linkPath, exists: pathExists}
+				results = append(results, currentLink)
+			} else {
+				fmt.Printf("%s is not a link!\n", fileName)
+			}
 		}
 	}
+
+	outputResults(results, ugly)
 }
 
 func listLinks(ugly bool, showHidden bool) {
@@ -87,9 +91,7 @@ func main() {
 	arg.MustParse(&args)
 
 	if len(args.FileName) > 0 {
-		if args.FileName[0] != "" {
-			handleFileName(args.FileName[0], args.Ugly)
-		}
+		handleFileName(args.FileName, args.Ugly)
 	} else {
 		listLinks(args.Ugly, args.Hidden)
 	}
