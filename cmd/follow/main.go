@@ -67,7 +67,6 @@ func toYesNo(value bool) string {
 	return ErrorColor("No")
 }
 
-// TODO: Add color to broken links
 func outputResults(results []Link, ugly bool) {
 	writer := tabwriter.NewWriter(os.Stdout, 1, 4, 1, ' ', 0)
 	outputTable := table.NewWriter()
