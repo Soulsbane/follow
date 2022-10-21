@@ -64,7 +64,7 @@ func toYesNo(value bool) string {
 		return "Yes"
 	}
 
-	return ErrorColor("No")
+	return "No"
 }
 
 func outputResults(results []Link, ugly bool) {
@@ -82,7 +82,11 @@ func outputResults(results []Link, ugly bool) {
 				fmt.Fprintf(writer, "%s\t => %s %s\n", link.name, link.path, ErrorColor("(BROKEN)"))
 			}
 		} else {
-			outputTable.AppendRow(table.Row{link.name, link.path, toYesNo(link.exists)})
+			if link.exists {
+				outputTable.AppendRow(table.Row{link.name, link.path, toYesNo(link.exists)})
+			} else {
+				outputTable.AppendRow(table.Row{link.name, ErrorColor(link.path), ErrorColor(toYesNo(link.exists))})
+			}
 		}
 	}
 
