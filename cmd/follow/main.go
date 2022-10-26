@@ -28,8 +28,8 @@ func handleFileName(fileNames []string, ugly bool) {
 		if err != nil {
 			fmt.Printf("%s could not be found!\n", fileName)
 		} else {
-			if fileutils.IsLink(info) {
-				linkPath, pathExists := fileutils.GetLinkPath(info)
+			if fileutils.IsLink(info.Mode()) {
+				linkPath, pathExists := fileutils.GetLinkPath(info.Name())
 				currentLink := Link{name: fileName, path: linkPath, exists: pathExists}
 				results = append(results, currentLink)
 			} else {
@@ -46,7 +46,7 @@ func listLinks(ugly bool, showHidden bool) {
 	results := []Link{}
 
 	for _, link := range links {
-		linkPath, exists := fileutils.GetLinkPath(link)
+		linkPath, exists := fileutils.GetLinkPath(link.Name())
 		currentLink := Link{name: link.Name(), path: linkPath, exists: exists}
 
 		results = append(results, currentLink)

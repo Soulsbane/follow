@@ -6,7 +6,7 @@ import (
 	"runtime"
 )
 
-func IsFileHidden(info os.FileInfo) bool {
+func IsFileHidden(info os.DirEntry) bool {
 	if runtime.GOOS != "windows" {
 		return info.Name()[0:1] == "."
 	}
@@ -22,13 +22,13 @@ func FileOrPathExists(fileName string) bool {
 	return true
 }
 
-func IsLink(info os.FileInfo) bool {
-	return info.Mode()&os.ModeSymlink != 0
+func IsLink(info os.FileMode) bool {
+	return info&os.ModeSymlink != 0
 }
 
 // GetLinkPath returns the path of the link and a boolean indicating if the link destination path exists
-func GetLinkPath(info os.FileInfo) (string, bool) {
-	realPath, err := os.Readlink(info.Name())
+func GetLinkPath(name string) (string, bool) {
+	realPath, err := os.Readlink(name)
 
 	if err != nil {
 		return "", FileOrPathExists(realPath)

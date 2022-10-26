@@ -1,21 +1,20 @@
 package fileutils
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 )
 
-func GetListOfLinks(includeHidden bool) []os.FileInfo {
-	var files []os.FileInfo
-	dirList, err := ioutil.ReadDir(".")
+func GetListOfLinks(includeHidden bool) []os.DirEntry {
+	var files []os.DirEntry
+	dirList, err := os.ReadDir(".")
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for _, f := range dirList {
-		if IsLink(f) {
+		if IsLink(f.Type()) {
 			if IsFileHidden(f) {
 				if includeHidden {
 					files = append(files, f)
