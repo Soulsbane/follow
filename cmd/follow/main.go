@@ -29,7 +29,7 @@ func handleFileName(fileNames []string, ugly bool) {
 			fmt.Printf("%s could not be found!\n", fileName)
 		} else {
 			if fileutils.IsLink(info.Mode()) {
-				linkPath, pathExists := fileutils.GetLinkPath(info.Name())
+				linkPath, pathExists := fileutils.GetLinkPath(fileName)
 				currentLink := Link{name: fileName, path: linkPath, exists: pathExists}
 				results = append(results, currentLink)
 			} else {
