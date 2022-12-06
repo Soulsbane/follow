@@ -19,14 +19,14 @@ type Link struct {
 
 var ErrorColor = gchalk.WithBold().Red
 
-func handleFileName(fileNames []string, ugly bool) {
+func handleFileName(fileNames []string, ugly bool) ([]Link, error) {
 	results := []Link{}
 
 	for _, fileName := range fileNames {
 		info, err := os.Lstat(fileName)
 
 		if err != nil {
-			fmt.Printf("%s could not be found!\n", fileName)
+			return results, err
 		} else {
 			if fileutils.IsLink(info.Mode()) {
 				linkPath, pathExists := fileutils.GetLinkPath(fileName)
@@ -38,10 +38,10 @@ func handleFileName(fileNames []string, ugly bool) {
 		}
 	}
 
-	outputResults(results, ugly)
+	return results, nil
 }
 
-func listLinks(ugly bool, showHidden bool) {
+func listLinks(ugly bool, showHidden bool) []Link {
 	links := fileutils.GetListOfLinks(showHidden)
 	results := []Link{}
 
@@ -52,11 +52,7 @@ func listLinks(ugly bool, showHidden bool) {
 		results = append(results, currentLink)
 	}
 
-	if len(results) > 0 {
-		outputResults(results, ugly)
-	} else {
-		fmt.Println("No links found!")
-	}
+	return results
 }
 
 func toYesNo(value bool) string {
@@ -105,8 +101,20 @@ func main() {
 	arg.MustParse(&args)
 
 	if len(args.FileName) > 0 {
-		handleFileName(args.FileName, args.Ugly)
+		links, err := handleFileName(args.FileName, args.Ugly)
+
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			outputResults(links, args.Ugly)
+		}
 	} else {
-		listLinks(args.Ugly, args.Hidden)
+		links := listLinks(args.Ugly, args.Hidden)
+
+		if len(links) > 0 {
+			outputResults(links, args.Ugly)
+		} else {
+			fmt.Println("No links found!")
+		}
 	}
 }
